@@ -24,7 +24,11 @@ class Algolia_Headless_Replacer {
     }
 
     public function replace_algolia_permalink_to_public_site_domain ( $url ) {
-        $replaced_domain = get_option( 'algolia_headless_domain' );
+        $replaced_url = get_option( 'algolia_headless_domain' );
+        if ( ! $replaced_url ) return $url;
+        $target = wp_parse_url( $replaced_url );
+        $path = $target['path'] ? $target['path']: '';
+        $replaced_domain = $target['host'] . $path;
         if ( ! $replaced_domain ) return $url;
         $parsed_url     = wp_parse_url( $url );
         $replace_target = $parsed_url['host'];
@@ -48,22 +52,37 @@ class Algolia_Headless_Replacer {
 
 class Algolia_Headless_Settings {
 	function __construct() {
-		add_action( 'admin_init', array( $this, 'init_options' ) );
-	}
-
-	public function init_options() {
-		register_setting( 'algolia-account-settings', 'algolia_headless_domain', array(
+        add_action( 'admin_init', array( $this, 'init_options' ) );
+        add_action( 'init', array( $this, 'register_opion' ) );
+    }
+    
+    public function register_opion() {
+		register_setting( 'reading', 'algolia_headless_domain', array(
 			'type' => 'string',
-			'sanitize_callback' => 'esc_attr',
+			'sanitize_callback' => 'esc_url',
 			'show_in_rest' => true,
 		) );
+    }
+
+	public function init_options() {
+        $this->register_opion();
+		add_settings_section(
+			'algolia_headless_settings',
+			__( 'Algolia Headless extension', 'algolia-headless-mode' ),
+			array( $this, 'algolia_setting_description' ),
+			'reading',
+		);
 		add_settings_field(
 			'algolia_headless_domain',
 			__( 'Public site domain', 'algolia-headless-mode' ),
 			array( $this, 'algolia_public_site_domain' ),
-			'algolia-account-settings',
-			'algolia_section_settings',
+			'reading',
+			'algolia_headless_settings',
 		);
+    }
+    
+	public function algolia_setting_description() {
+		_e( 'You can replace the post domain from the WordPress to your public site.', 'algolia-headless-mode' );
 	}
 
 	public function algolia_public_site_domain() {
@@ -74,11 +93,8 @@ class Algolia_Headless_Settings {
             class="regular-text"
 			type="text"
 			value="<?php form_option('algolia_headless_domain'); ?>"
-		/><br/>
+		/>
 		<?php
-		printf(
-			__( 'You can replace the post domain from the WordPress to your public site.', 'algolia-headless-mode' ),
-		);
 	}
 }
 
