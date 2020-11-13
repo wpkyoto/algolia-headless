@@ -68,13 +68,13 @@ class Algolia_Headless_Settings {
         $this->register_opion();
 		add_settings_section(
 			'algolia_headless_settings',
-			__( 'Algolia Headless extension', 'algolia-headless-mode' ),
+			__( 'Algolia Headless extension', 'algolia-headless' ),
 			array( $this, 'algolia_setting_description' ),
 			'reading',
 		);
 		add_settings_field(
 			'algolia_headless_domain',
-			__( 'Public site domain', 'algolia-headless-mode' ),
+			__( 'Public site domain', 'algolia-headless' ),
 			array( $this, 'algolia_public_site_domain' ),
 			'reading',
 			'algolia_headless_settings',
@@ -82,7 +82,7 @@ class Algolia_Headless_Settings {
     }
     
 	public function algolia_setting_description() {
-		_e( 'You can replace the post domain from the WordPress to your public site.', 'algolia-headless-mode' );
+		_e( 'You can replace the post domain from the WordPress to your public site.', 'algolia-headless' );
 	}
 
 	public function algolia_public_site_domain() {
