@@ -196,7 +196,7 @@ class Algolia_Headless_CLI {
 	 *
 	 * @when after_wp_load
 	 */
-	public function logs( $args, $assoc_args ) {
+	public function logs( $assoc_args ) {
 		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
 			WP_CLI::warning( 'WP_DEBUG is not enabled. Debug logging is disabled.' );
 			return;

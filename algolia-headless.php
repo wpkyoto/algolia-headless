@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:     Search with Algolia Headless extention
+ * Plugin Name:     Search with Algolia Headless extension
  * Plugin URI:      https://wp-kyoto.net
  * Description:     Simply extension for WP Search with Algolia. Replace the indices domain from the WordPress to custom domain.
  * Author:          Hidetaka Okamoto
@@ -339,7 +339,6 @@ class Algolia_Headless_Settings {
 	 * Initialize plugin options in admin
 	 */
 	public function init_options() {
-		$this->register_option();
 		add_settings_section(
 			'algolia_headless_settings',
 			__( 'Algolia Headless extension', 'algolia-headless' ),

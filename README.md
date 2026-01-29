@@ -1,4 +1,4 @@
-# Search with Algolia Headless extention
+# Search with Algolia Headless extension
 Donate link: https://www.amazon.jp/hz/wishlist/ls/1UYH9PSDMB3FZ?ref_=wl_share
 Tags: algolia,headless,search,wp-cli
 Requires at least: 5.5
