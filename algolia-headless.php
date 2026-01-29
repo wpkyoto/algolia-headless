@@ -394,6 +394,70 @@ class Algolia_Headless_Admin_Notices {
 	 */
 	public function __construct() {
 		add_action( 'admin_notices', array( $this, 'display_notices' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_dismiss_script' ) );
+		add_action( 'wp_ajax_algolia_headless_dismiss_notice', array( $this, 'ajax_dismiss_notice' ) );
+	}
+
+	/**
+	 * Enqueue dismiss notice script
+	 */
+	public function enqueue_dismiss_script() {
+		wp_add_inline_script(
+			'jquery',
+			$this->get_dismiss_script(),
+			'after'
+		);
+	}
+
+	/**
+	 * Get dismiss notice JavaScript
+	 *
+	 * @return string JavaScript code.
+	 */
+	private function get_dismiss_script() {
+		$ajax_url = admin_url( 'admin-ajax.php' );
+		$nonce    = wp_create_nonce( 'algolia_headless_dismiss_notice' );
+
+		return "
+		jQuery(document).ready(function($) {
+			$(document).on('click', '.notice.is-dismissible[data-notice-id]', function() {
+				var noticeId = $(this).data('notice-id');
+				if (!noticeId) return;
+
+				$.post('" . esc_js( $ajax_url ) . "', {
+					action: 'algolia_headless_dismiss_notice',
+					notice_id: noticeId,
+					nonce: '" . esc_js( $nonce ) . "'
+				});
+			});
+		});
+		";
+	}
+
+	/**
+	 * AJAX handler for dismissing notices
+	 */
+	public function ajax_dismiss_notice() {
+		// Verify nonce.
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'algolia_headless_dismiss_notice' ) ) {
+			wp_send_json_error( 'Invalid nonce' );
+		}
+
+		// Get notice ID.
+		if ( ! isset( $_POST['notice_id'] ) ) {
+			wp_send_json_error( 'Missing notice ID' );
+		}
+
+		$notice_id = sanitize_key( $_POST['notice_id'] );
+
+		// Save dismissal.
+		update_user_meta(
+			get_current_user_id(),
+			"algolia_headless_dismissed_{$notice_id}",
+			true
+		);
+
+		wp_send_json_success();
 	}
 
 	/**
